@@ -14,9 +14,16 @@ let started = false;
 let shake = 0;
 let flash = 0;
 
-// 🔊 звук
+// 🔊 звуки (НОРМАЛЬНЫЕ)
 const eatSound = new Audio("https://actions.google.com/sounds/v1/cartoon/pop.ogg");
 const dieSound = new Audio("https://actions.google.com/sounds/v1/explosions/explosion.ogg");
+
+// 📳 вибрация
+function vibrate(pattern){
+  if(navigator.vibrate){
+    navigator.vibrate(pattern);
+  }
+}
 
 // 🏆 рекорд
 best = localStorage.getItem("snake_best") || 0;
@@ -55,10 +62,15 @@ function die(){
   shake = 15;
   flash = 0.8;
 
+  // 🔊 BOOM (ВАЖНО)
   dieSound.currentTime = 0;
+  dieSound.volume = 1;
   dieSound.play();
 
-  // тряска body
+  // 📳 вибрация
+  vibrate([200, 100, 200]);
+
+  // 💥 тряска
   document.body.classList.add("shake");
   setTimeout(()=> document.body.classList.remove("shake"), 300);
 
@@ -75,12 +87,10 @@ function update(){
     y: snake[0].y + dir.y
   };
 
-  // стены
   if(head.x<0 || head.y<0 || head.x>=20 || head.y>=20){
     return die();
   }
 
-  // в себя
   for(let s of snake){
     if(s.x===head.x && s.y===head.y) return die();
   }
@@ -94,7 +104,8 @@ function update(){
     eatSound.currentTime = 0;
     eatSound.play();
 
-    // ⚡ ускорение
+    vibrate(50);
+
     if(speed > 80){
       speed -= 4;
       clearInterval(gameLoop);
@@ -118,7 +129,6 @@ function update(){
 function draw(){
   ctx.save();
 
-  // 💥 тряска canvas
   if(shake > 0){
     ctx.translate((Math.random()-0.5)*10,(Math.random()-0.5)*10);
     shake--;
@@ -148,7 +158,7 @@ function draw(){
     ctx.fill();
   });
 
-  // 👀 ЧЁРНЫЕ глаза
+  // 👀 глаза ЧЁРНЫЕ
   let head = snake[0];
   ctx.fillStyle = "black";
   ctx.beginPath();
@@ -168,12 +178,12 @@ function draw(){
   document.getElementById("score").innerText = score;
 }
 
-// 📱 ФИКС СКРОЛЛА (ВАЖНО)
+// 📱 фикс свайпа
 document.body.addEventListener("touchmove", e=>{
   e.preventDefault();
 }, { passive:false });
 
-// 📱 свайпы
+// свайпы
 let startX=0,startY=0;
 
 canvas.addEventListener("touchstart", e=>{
@@ -197,7 +207,7 @@ canvas.addEventListener("touchend", e=>{
   }
 });
 
-// 🖥 клавиатура
+// клавиатура
 document.addEventListener("keydown", e=>{
   if(!started) return;
 
@@ -207,7 +217,7 @@ document.addEventListener("keydown", e=>{
   if(e.key==="ArrowRight" && dir.x!==-1) dir={x:1,y:0};
 });
 
-// ▶️ старт
+// старт
 document.getElementById("startBtn").onclick = ()=>{
   document.getElementById("menu").style.display = "none";
   startGame();
