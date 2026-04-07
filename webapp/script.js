@@ -21,9 +21,9 @@ best = localStorage.getItem("snake_best") || 0;
 document.getElementById("best").innerText = best;
 
 // UI
-document.getElementById("topBtn").onclick = openRating;
+
 document.getElementById("closeRating").onclick = () => {
-  document.getElementById("ratingModal").classList.add("hidden");
+document.getElementById("ratingModal").classList.add("hidden");
 };
 
 function openRating() {
@@ -140,3 +140,14 @@ document.getElementById("startBtn").onclick = ()=>{
   document.getElementById("menu").style.display = "none";
   startGame();
 };
+
+// фикс кнопки ТОП
+window.addEventListener("load", () => {
+  const topBtn = document.getElementById("topBtn");
+
+  if(topBtn){
+    topBtn.onclick = () => {
+      openRating();
+    };
+  }
+});
