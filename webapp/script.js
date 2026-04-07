@@ -74,7 +74,6 @@ function die(){
   document.body.classList.add("shake");
   setTimeout(()=> document.body.classList.remove("shake"), 400);
 
-  // 🏆 ОТПРАВКА РЕЙТИНГА
   sendScore(score);
   loadLeaderboard();
 
@@ -128,7 +127,7 @@ function update(){
   draw();
 }
 
-// 🎨 рисовка
+// 🎨 РИСОВКА (УЛУЧШЕННАЯ)
 function draw(){
   ctx.save();
 
@@ -140,6 +139,7 @@ function draw(){
   ctx.fillStyle = "#1e3a5f";
   ctx.fillRect(0,0,400,400);
 
+  // 🍎 яблоко
   ctx.fillStyle = "red";
   ctx.beginPath();
   ctx.arc(food.x*20+10, food.y*20+10, 8, 0, Math.PI*2);
@@ -148,17 +148,32 @@ function draw(){
   ctx.fillStyle = "green";
   ctx.fillRect(food.x*20+9, food.y*20+2, 3, 6);
 
-  snake.forEach((s,i)=>{
-    let r = 10 - i*0.2;
-    if(r < 5) r = 5;
+  // 🐍 === SLITHER STYLE ===
+  for(let i = snake.length - 1; i >= 0; i--){
+    let s = snake[i];
 
-    ctx.fillStyle = i===0 ? "#00ff88" : "#00cc66";
+    // 🌊 волна
+    let wave = Math.sin((Date.now()/100) + i) * 2;
+
+    let x = s.x * 20 + 10 + wave;
+    let y = s.y * 20 + 10;
+
+    let radius = 10 - i * 0.2;
+    if(radius < 5) radius = 5;
+
+    // 🎨 градиент
+    let gradient = ctx.createRadialGradient(x, y, 2, x, y, radius);
+    gradient.addColorStop(0, "#00ff88");
+    gradient.addColorStop(1, "#007744");
+
+    ctx.fillStyle = gradient;
 
     ctx.beginPath();
-    ctx.arc(s.x*20+10, s.y*20+10, r, 0, Math.PI*2);
+    ctx.arc(x, y, radius, 0, Math.PI*2);
     ctx.fill();
-  });
+  }
 
+  // 👀 глаза (чёрные)
   let head = snake[0];
   ctx.fillStyle = "black";
   ctx.beginPath();
@@ -228,7 +243,7 @@ function sendScore(score){
   const name = prompt("Твоє ім'я:");
   if(!name) return;
 
-  fetch("http://localhost:3000/score", {
+  fetch("https://snake-server-5swh.onrender.com/score", {
     method: "POST",
     headers: {"Content-Type": "application/json"},
     body: JSON.stringify({ name, score })
@@ -236,7 +251,7 @@ function sendScore(score){
 }
 
 function loadLeaderboard(){
-  fetch("http://localhost:3000/scores")
+  fetch("https://snake-server-5swh.onrender.com/scores")
     .then(res => res.json())
     .then(data => {
       const div = document.getElementById("leaderboard");
@@ -248,5 +263,4 @@ function loadLeaderboard(){
     });
 }
 
-// загрузка при открытии
 loadLeaderboard();
