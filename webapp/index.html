@@ -3,23 +3,21 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>RPG Game</title>
+<title>Snake PvE</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <canvas id="game"></canvas>
 
-<div id="ui">
-  ❤️ <span id="hp">100</span>
+<div class="controls">
+  <button onclick="setDir('left')">⬅️</button>
+  <button onclick="setDir('up')">⬆️</button>
+  <button onclick="setDir('down')">⬇️</button>
+  <button onclick="setDir('right')">➡️</button>
 </div>
 
-<div class="controls">
-  <button onclick="moveLeft()">⬅️</button>
-  <button onclick="jump()">⬆️</button>
-  <button onclick="moveRight()">➡️</button>
-  <button onclick="attack()">⚔️</button>
-</div>
+<div id="score">Score: 0</div>
 
 <script src="script.js"></script>
 </body>
