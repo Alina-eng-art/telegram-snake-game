@@ -4,62 +4,72 @@ const ctx = canvas.getContext('2d');
 canvas.width = 400;
 canvas.height = 400;
 
-const size = 20;
+const grid = 20;
 let snake = [{x: 10, y: 10}];
-let dir = 'right';
+let dir = {x: 1, y: 0};
 let food = randomFood();
 
 let score = 0;
 let best = localStorage.getItem('snake_best') || 0;
-
 document.getElementById('best').innerText = best;
 
-function randomFood() {
-  return {
-    x: Math.floor(Math.random() * 20),
-    y: Math.floor(Math.random() * 20)
-  };
-}
+let speed = 120;
+let boost = false;
+let time = 0;
 
+// 🎮 управление
 function setDir(d) {
-  dir = d;
+  if (d === 'up') dir = {x:0,y:-1};
+  if (d === 'down') dir = {x:0,y:1};
+  if (d === 'left') dir = {x:-1,y:0};
+  if (d === 'right') dir = {x:1,y:0};
 }
 
 document.addEventListener('keydown', e => {
-  if (e.key === 'ArrowUp') dir = 'up';
-  if (e.key === 'ArrowDown') dir = 'down';
-  if (e.key === 'ArrowLeft') dir = 'left';
-  if (e.key === 'ArrowRight') dir = 'right';
+  if (e.key === 'ArrowUp') setDir('up');
+  if (e.key === 'ArrowDown') setDir('down');
+  if (e.key === 'ArrowLeft') setDir('left');
+  if (e.key === 'ArrowRight') setDir('right');
+
+  if (e.key === ' ') boost = true;
 });
 
-function gameLoop() {
-  let head = {...snake[0]};
+document.addEventListener('keyup', e => {
+  if (e.key === ' ') boost = false;
+});
 
-  if (dir === 'right') head.x++;
-  if (dir === 'left') head.x--;
-  if (dir === 'up') head.y--;
-  if (dir === 'down') head.y++;
+function randomFood() {
+  return {
+    x: Math.floor(Math.random() * grid),
+    y: Math.floor(Math.random() * grid)
+  };
+}
 
-  // 💀 СМЕРТЬ ОБ СТЕНЫ
-  if (head.x < 0 || head.y < 0 || head.x >= 20 || head.y >= 20) {
-    return reset();
+function update() {
+  let head = {
+    x: snake[0].x + dir.x,
+    y: snake[0].y + dir.y
+  };
+
+  // 💀 стены
+  if (head.x < 0 || head.y < 0 || head.x >= grid || head.y >= grid) {
+    return die();
   }
 
-  // 💀 СМЕРТЬ ОБ СЕБЯ
+  // 💀 в себя
   for (let s of snake) {
     if (s.x === head.x && s.y === head.y) {
-      return reset();
+      return die();
     }
   }
 
   snake.unshift(head);
 
-  // 🍎 ЕДА
+  // 🍎 еда
   if (head.x === food.x && head.y === food.y) {
     food = randomFood();
     score++;
-
-    playEatSound();
+    playEat();
 
     if (score > best) {
       best = score;
@@ -70,24 +80,28 @@ function gameLoop() {
   } else {
     snake.pop();
   }
-
-  draw();
 }
 
 function draw() {
-  ctx.fillStyle = "#111";
+  time += 0.05;
+
+  ctx.fillStyle = "#0a0a0a";
   ctx.fillRect(0, 0, 400, 400);
 
-  // 🍎 яблоко (красивое)
+  // 🍎 ПУЛЬС ЯБЛОКА
+  const pulse = Math.sin(time) * 2;
+
   ctx.beginPath();
   ctx.fillStyle = "red";
-  ctx.arc(food.x*20+10, food.y*20+10, 8, 0, Math.PI*2);
+  ctx.arc(food.x*20+10, food.y*20+10, 8 + pulse, 0, Math.PI*2);
   ctx.fill();
 
-  // 🐍 змея (гладкая)
+  // 🐍 змея с эффектом хвоста
   snake.forEach((s, i) => {
-    ctx.fillStyle = i === 0 ? "#00ffcc" : "#00ccaa";
+    const alpha = 1 - i / snake.length;
+
     ctx.beginPath();
+    ctx.fillStyle = `rgba(0,255,200,${alpha})`;
     ctx.arc(s.x*20+10, s.y*20+10, 9, 0, Math.PI*2);
     ctx.fill();
   });
@@ -95,23 +109,36 @@ function draw() {
   document.getElementById('score').innerText = score;
 }
 
-function reset() {
-  playDeadSound();
+// 💀 смерть с эффектом
+function die() {
+  playDead();
 
-  snake = [{x: 10, y: 10}];
-  dir = 'right';
-  score = 0;
+  // 💥 эффект вспышки
+  ctx.fillStyle = "red";
+  ctx.fillRect(0,0,400,400);
+
+  setTimeout(() => {
+    snake = [{x:10,y:10}];
+    dir = {x:1,y:0};
+    score = 0;
+  }, 200);
 }
 
-// 🔊 ЗВУКИ
-function playEatSound() {
-  const audio = new Audio("https://actions.google.com/sounds/v1/cartoon/pop.ogg");
-  audio.play();
+// 🔊 звук
+function playEat() {
+  new Audio("https://actions.google.com/sounds/v1/cartoon/pop.ogg").play();
 }
 
-function playDeadSound() {
-  const audio = new Audio("https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg");
-  audio.play();
+function playDead() {
+  new Audio("https://actions.google.com/sounds/v1/cartoon/clang_and_wobble.ogg").play();
 }
 
-setInterval(gameLoop, 120);
+// 🔁 цикл
+function loop() {
+  update();
+  draw();
+
+  setTimeout(loop, boost ? 60 : 120);
+}
+
+loop();
