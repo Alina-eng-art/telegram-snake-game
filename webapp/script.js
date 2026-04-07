@@ -14,7 +14,7 @@ let started = false;
 let shake = 0;
 let flash = 0;
 
-// 🔊 звуки (НОРМАЛЬНЫЕ)
+// 🔊 звуки
 const eatSound = new Audio("https://actions.google.com/sounds/v1/cartoon/pop.ogg");
 const dieSound = new Audio("https://actions.google.com/sounds/v1/explosions/explosion.ogg");
 
@@ -29,13 +29,17 @@ function vibrate(pattern){
 best = localStorage.getItem("snake_best") || 0;
 document.getElementById("best").innerText = best;
 
-// ▶️ старт
+// ▶️ старт игры
 function startGame(){
   snake = [{x:10,y:10}];
   dir = {x:1,y:0};
   food = randomFood();
   score = 0;
   speed = 170;
+
+  // ❌ убираем эффекты при старте
+  shake = 0;
+  flash = 0;
 
   document.getElementById("score").innerText = score;
 
@@ -58,26 +62,27 @@ function die(){
   clearInterval(gameLoop);
   started = false;
 
-  // 💥 эффекты
-  shake = 15;
-  flash = 0.8;
+  // 💥 эффекты ТОЛЬКО тут
+  shake = 20;
+  flash = 1;
 
-  // 🔊 BOOM (ВАЖНО)
+  // 🔊 BOOM
+  dieSound.pause();
   dieSound.currentTime = 0;
   dieSound.volume = 1;
-  dieSound.play();
+  dieSound.play().catch(()=>{});
 
   // 📳 вибрация
   vibrate([200, 100, 200]);
 
   // 💥 тряска
   document.body.classList.add("shake");
-  setTimeout(()=> document.body.classList.remove("shake"), 300);
+  setTimeout(()=> document.body.classList.remove("shake"), 400);
 
   // показать меню
   setTimeout(()=>{
     document.getElementById("menu").style.display = "flex";
-  }, 300);
+  }, 400);
 }
 
 // 🔁 логика
@@ -87,16 +92,19 @@ function update(){
     y: snake[0].y + dir.y
   };
 
+  // стены
   if(head.x<0 || head.y<0 || head.x>=20 || head.y>=20){
     return die();
   }
 
+  // в себя
   for(let s of snake){
     if(s.x===head.x && s.y===head.y) return die();
   }
 
   snake.unshift(head);
 
+  // еда
   if(head.x===food.x && head.y===food.y){
     food = randomFood();
     score++;
@@ -106,6 +114,7 @@ function update(){
 
     vibrate(50);
 
+    // ускорение
     if(speed > 80){
       speed -= 4;
       clearInterval(gameLoop);
@@ -129,6 +138,7 @@ function update(){
 function draw(){
   ctx.save();
 
+  // 💥 тряска
   if(shake > 0){
     ctx.translate((Math.random()-0.5)*10,(Math.random()-0.5)*10);
     shake--;
@@ -146,7 +156,7 @@ function draw(){
   ctx.fillStyle = "green";
   ctx.fillRect(food.x*20+9, food.y*20+2, 3, 6);
 
-  // 🐍 змея
+  // 🐍 змейка
   snake.forEach((s,i)=>{
     let r = 10 - i*0.2;
     if(r < 5) r = 5;
@@ -158,7 +168,7 @@ function draw(){
     ctx.fill();
   });
 
-  // 👀 глаза ЧЁРНЫЕ
+  // 👀 глаза (чёрные)
   let head = snake[0];
   ctx.fillStyle = "black";
   ctx.beginPath();
@@ -178,12 +188,12 @@ function draw(){
   document.getElementById("score").innerText = score;
 }
 
-// 📱 фикс свайпа
+// 📱 фикс скролла
 document.body.addEventListener("touchmove", e=>{
   e.preventDefault();
 }, { passive:false });
 
-// свайпы
+// 📱 свайпы
 let startX=0,startY=0;
 
 canvas.addEventListener("touchstart", e=>{
@@ -207,7 +217,7 @@ canvas.addEventListener("touchend", e=>{
   }
 });
 
-// клавиатура
+// 🖥 клавиатура
 document.addEventListener("keydown", e=>{
   if(!started) return;
 
@@ -217,7 +227,7 @@ document.addEventListener("keydown", e=>{
   if(e.key==="ArrowRight" && dir.x!==-1) dir={x:1,y:0};
 });
 
-// старт
+// ▶️ кнопка
 document.getElementById("startBtn").onclick = ()=>{
   document.getElementById("menu").style.display = "none";
   startGame();
