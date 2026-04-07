@@ -3,21 +3,26 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Block Blast</title>
+<title>RPG Game</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-<div id="game-container">
-  <h1>💎 Block Blast</h1>
+<div class="game">
+  <h1>⚔️ RPG GAME</h1>
 
-  <div id="score">Очки: 0</div>
+  <div class="stats">
+    <p>❤️ HP: <span id="hp">100</span></p>
+    <p>⚔️ Атака: <span id="attack">10</span></p>
+    <p>👹 Враг HP: <span id="enemy">50</span></p>
+  </div>
 
-  <canvas id="gameCanvas"></canvas>
+  <div class="buttons">
+    <button onclick="attack()">⚔️ Атаковать</button>
+    <button onclick="heal()">❤️ Лечиться</button>
+  </div>
 
-  <div id="next-blocks"></div>
-
-  <button id="resetBtn">🔄 Заново</button>
+  <p id="log"></p>
 </div>
 
 <script src="script.js"></script>

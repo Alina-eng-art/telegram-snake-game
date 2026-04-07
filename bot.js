@@ -1,6 +1,6 @@
 const { Telegraf, Markup } = require('telegraf')
 
-const bot = new Telegraf('ТВОЙ_НОВЫЙ_ТОКЕН')
+const bot = new Telegraf('8629708298:AAHo4o10gYQKngSegE59gTvEY0WPOlmbOWU')
 
 // ===== ИГРОКИ =====
 const players = {}
@@ -41,7 +41,7 @@ bot.start((ctx) => {
       ['⚔️ RPG режим'],
       ['📊 Статус']
     ]).resize()
-  )
+  )    
 })
 
 // ===== WEB APP КНОПКА =====
