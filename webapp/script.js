@@ -10,6 +10,10 @@ let snake, dir, food, score, best, speed;
 let gameLoop;
 let started = false;
 
+// 💥 эффекты
+let shake = 0;
+let flash = 0;
+
 // 🔊 звук
 const eatSound = new Audio("https://actions.google.com/sounds/v1/cartoon/pop.ogg");
 const dieSound = new Audio("https://actions.google.com/sounds/v1/explosions/explosion.ogg");
@@ -18,13 +22,13 @@ const dieSound = new Audio("https://actions.google.com/sounds/v1/explosions/expl
 best = localStorage.getItem("snake_best") || 0;
 document.getElementById("best").innerText = best;
 
-// старт
+// ▶️ старт
 function startGame(){
   snake = [{x:10,y:10}];
   dir = {x:1,y:0};
   food = randomFood();
   score = 0;
-  speed = 180;
+  speed = 170;
 
   document.getElementById("score").innerText = score;
 
@@ -47,10 +51,21 @@ function die(){
   clearInterval(gameLoop);
   started = false;
 
+  // 💥 эффекты
+  shake = 15;
+  flash = 0.8;
+
   dieSound.currentTime = 0;
   dieSound.play();
 
-  document.getElementById("menu").style.display = "flex";
+  // тряска body
+  document.body.classList.add("shake");
+  setTimeout(()=> document.body.classList.remove("shake"), 300);
+
+  // показать меню
+  setTimeout(()=>{
+    document.getElementById("menu").style.display = "flex";
+  }, 300);
 }
 
 // 🔁 логика
@@ -60,10 +75,12 @@ function update(){
     y: snake[0].y + dir.y
   };
 
+  // стены
   if(head.x<0 || head.y<0 || head.x>=20 || head.y>=20){
     return die();
   }
 
+  // в себя
   for(let s of snake){
     if(s.x===head.x && s.y===head.y) return die();
   }
@@ -77,8 +94,9 @@ function update(){
     eatSound.currentTime = 0;
     eatSound.play();
 
-    if(speed > 90){
-      speed -= 5;
+    // ⚡ ускорение
+    if(speed > 80){
+      speed -= 4;
       clearInterval(gameLoop);
       gameLoop = setInterval(update, speed);
     }
@@ -96,12 +114,20 @@ function update(){
   draw();
 }
 
-// 🎨 КРАСИВАЯ РИСОВКА
+// 🎨 рисовка
 function draw(){
+  ctx.save();
+
+  // 💥 тряска canvas
+  if(shake > 0){
+    ctx.translate((Math.random()-0.5)*10,(Math.random()-0.5)*10);
+    shake--;
+  }
+
   ctx.fillStyle = "#1e3a5f";
   ctx.fillRect(0,0,400,400);
 
-  // 🍎 яблоко (реалистичнее)
+  // 🍎 яблоко
   ctx.fillStyle = "red";
   ctx.beginPath();
   ctx.arc(food.x*20+10, food.y*20+10, 8, 0, Math.PI*2);
@@ -110,7 +136,7 @@ function draw(){
   ctx.fillStyle = "green";
   ctx.fillRect(food.x*20+9, food.y*20+2, 3, 6);
 
-  // 🐍 змея (плавная)
+  // 🐍 змея
   snake.forEach((s,i)=>{
     let r = 10 - i*0.2;
     if(r < 5) r = 5;
@@ -122,33 +148,54 @@ function draw(){
     ctx.fill();
   });
 
-  // глаза
+  // 👀 ЧЁРНЫЕ глаза
   let head = snake[0];
-  ctx.fillStyle = "white";
+  ctx.fillStyle = "black";
   ctx.beginPath();
   ctx.arc(head.x*20+6, head.y*20+8, 2, 0, Math.PI*2);
   ctx.arc(head.x*20+14, head.y*20+8, 2, 0, Math.PI*2);
   ctx.fill();
 
+  ctx.restore();
+
+  // ⚡ вспышка
+  if(flash > 0){
+    ctx.fillStyle = `rgba(255,255,255,${flash})`;
+    ctx.fillRect(0,0,400,400);
+    flash -= 0.05;
+  }
+
   document.getElementById("score").innerText = score;
 }
 
-// 🎮 ДЖОЙСТИК
-document.getElementById("up").onclick = () => {
-  if(dir.y !== 1) dir = {x:0,y:-1};
-};
+// 📱 ФИКС СКРОЛЛА (ВАЖНО)
+document.body.addEventListener("touchmove", e=>{
+  e.preventDefault();
+}, { passive:false });
 
-document.getElementById("down").onclick = () => {
-  if(dir.y !== -1) dir = {x:0,y:1};
-};
+// 📱 свайпы
+let startX=0,startY=0;
 
-document.getElementById("left").onclick = () => {
-  if(dir.x !== 1) dir = {x:-1,y:0};
-};
+canvas.addEventListener("touchstart", e=>{
+  let t = e.touches[0];
+  startX = t.clientX;
+  startY = t.clientY;
+});
 
-document.getElementById("right").onclick = () => {
-  if(dir.x !== -1) dir = {x:1,y:0};
-};
+canvas.addEventListener("touchend", e=>{
+  let t = e.changedTouches[0];
+
+  let dx = t.clientX - startX;
+  let dy = t.clientY - startY;
+
+  if(Math.abs(dx) > Math.abs(dy)){
+    if(dx>0 && dir.x!==-1) dir={x:1,y:0};
+    if(dx<0 && dir.x!==1) dir={x:-1,y:0};
+  } else {
+    if(dy>0 && dir.y!==-1) dir={x:0,y:1};
+    if(dy<0 && dir.y!==1) dir={x:0,y:-1};
+  }
+});
 
 // 🖥 клавиатура
 document.addEventListener("keydown", e=>{
