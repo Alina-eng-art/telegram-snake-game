@@ -59,11 +59,12 @@ window.addEventListener("load", () => {
     document.getElementById("ratingModal").classList.add("hidden");
   };
 
-  // 👉 разблокировка звука
+  // 🔊 разблокировка звука
   document.body.addEventListener("touchstart", unlockSound, { once:true });
   document.body.addEventListener("click", unlockSound, { once:true });
 });
 
+// открыть рейтинг
 function openRating(){
   document.getElementById("ratingModal").classList.remove("hidden");
   loadLeaderboard();
@@ -143,7 +144,7 @@ function randomFood(){
   };
 }
 
-// смерть
+// 💀 смерть
 function die(){
   clearInterval(gameLoop);
   started = false;
@@ -156,10 +157,18 @@ function die(){
   flash = 1;
   boomPower = 20;
 
+  // 🔊 звук
   dieSound.currentTime = 0;
   dieSound.play().catch(()=>{});
 
+  // 📳 вибрация
   vibrate([200,100,200]);
+
+  // 💥 ТРЯСКА ВСЕГО ЭКРАНА
+  document.body.classList.add("shake-screen");
+  setTimeout(()=>{
+    document.body.classList.remove("shake-screen");
+  }, 400);
 
   sendScore(score);
 
@@ -195,6 +204,7 @@ function update(){
 
     vibrate(50);
 
+    // плавное ускорение
     if(speed > 90){
       speed -= 3;
       clearInterval(gameLoop);
@@ -218,15 +228,10 @@ function update(){
 function draw(){
   ctx.save();
 
-  if(shake > 0){
-    ctx.translate((Math.random()-0.5)*shake,(Math.random()-0.5)*shake);
-    shake--;
-  }
-
   ctx.fillStyle = "#1e3a5f";
   ctx.fillRect(0,0,400,400);
 
-  // яблоко
+  // 🍎 яблоко
   ctx.fillStyle = "red";
   ctx.beginPath();
   ctx.arc(food.x*20+10, food.y*20+10, 8, 0, Math.PI*2);
@@ -235,7 +240,7 @@ function draw(){
   ctx.fillStyle = "green";
   ctx.fillRect(food.x*20+9, food.y*20+2, 3, 6);
 
-  // змейка
+  // 🐍 змейка
   for(let i = snake.length - 1; i >= 0; i--){
     let s = snake[i];
 
@@ -277,6 +282,7 @@ function draw(){
 
   ctx.restore();
 
+  // ⚡ FLASH
   if(flash > 0){
     ctx.fillStyle = `rgba(255,255,255,${flash})`;
     ctx.fillRect(0,0,400,400);
@@ -286,7 +292,7 @@ function draw(){
   document.getElementById("score").innerText = score;
 }
 
-// 📱 СВАЙПЫ
+// 📱 свайпы
 let startX=0,startY=0;
 
 canvas.addEventListener("touchstart", e=>{
@@ -328,7 +334,7 @@ document.addEventListener("keydown", e=>{
 
 // кнопка
 document.getElementById("startBtn").onclick = ()=>{
-  unlockSound(); // 🔊 важно!
+  unlockSound();
   document.getElementById("menu").style.display = "none";
   startGame();
 };
