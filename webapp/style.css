@@ -57,3 +57,18 @@ canvas {
   75% { transform: translate(-4px, 4px); }
   100% { transform: translate(0, 0); }
 }
+
+#leaderboard {
+  margin-top: 20px;
+  font-size: 14px;
+  text-align: center;
+  max-width: 300px;
+  background: rgba(255,255,255,0.05);
+  padding: 10px;
+  border-radius: 12px;
+}
+
+#leaderboard h3 {
+  margin: 5px 0;
+  color: #00ff88;
+}

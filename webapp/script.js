@@ -37,7 +37,6 @@ function startGame(){
   score = 0;
   speed = 170;
 
-  // ❌ убираем эффекты при старте
   shake = 0;
   flash = 0;
 
@@ -62,24 +61,23 @@ function die(){
   clearInterval(gameLoop);
   started = false;
 
-  // 💥 эффекты ТОЛЬКО тут
   shake = 20;
   flash = 1;
 
-  // 🔊 BOOM
   dieSound.pause();
   dieSound.currentTime = 0;
   dieSound.volume = 1;
   dieSound.play().catch(()=>{});
 
-  // 📳 вибрация
   vibrate([200, 100, 200]);
 
-  // 💥 тряска
   document.body.classList.add("shake");
   setTimeout(()=> document.body.classList.remove("shake"), 400);
 
-  // показать меню
+  // 🏆 ОТПРАВКА РЕЙТИНГА
+  sendScore(score);
+  loadLeaderboard();
+
   setTimeout(()=>{
     document.getElementById("menu").style.display = "flex";
   }, 400);
@@ -92,19 +90,16 @@ function update(){
     y: snake[0].y + dir.y
   };
 
-  // стены
   if(head.x<0 || head.y<0 || head.x>=20 || head.y>=20){
     return die();
   }
 
-  // в себя
   for(let s of snake){
     if(s.x===head.x && s.y===head.y) return die();
   }
 
   snake.unshift(head);
 
-  // еда
   if(head.x===food.x && head.y===food.y){
     food = randomFood();
     score++;
@@ -114,7 +109,6 @@ function update(){
 
     vibrate(50);
 
-    // ускорение
     if(speed > 80){
       speed -= 4;
       clearInterval(gameLoop);
@@ -138,7 +132,6 @@ function update(){
 function draw(){
   ctx.save();
 
-  // 💥 тряска
   if(shake > 0){
     ctx.translate((Math.random()-0.5)*10,(Math.random()-0.5)*10);
     shake--;
@@ -147,7 +140,6 @@ function draw(){
   ctx.fillStyle = "#1e3a5f";
   ctx.fillRect(0,0,400,400);
 
-  // 🍎 яблоко
   ctx.fillStyle = "red";
   ctx.beginPath();
   ctx.arc(food.x*20+10, food.y*20+10, 8, 0, Math.PI*2);
@@ -156,7 +148,6 @@ function draw(){
   ctx.fillStyle = "green";
   ctx.fillRect(food.x*20+9, food.y*20+2, 3, 6);
 
-  // 🐍 змейка
   snake.forEach((s,i)=>{
     let r = 10 - i*0.2;
     if(r < 5) r = 5;
@@ -168,7 +159,6 @@ function draw(){
     ctx.fill();
   });
 
-  // 👀 глаза (чёрные)
   let head = snake[0];
   ctx.fillStyle = "black";
   ctx.beginPath();
@@ -178,7 +168,6 @@ function draw(){
 
   ctx.restore();
 
-  // ⚡ вспышка
   if(flash > 0){
     ctx.fillStyle = `rgba(255,255,255,${flash})`;
     ctx.fillRect(0,0,400,400);
@@ -188,12 +177,12 @@ function draw(){
   document.getElementById("score").innerText = score;
 }
 
-// 📱 фикс скролла
+// 📱 фикс
 document.body.addEventListener("touchmove", e=>{
   e.preventDefault();
 }, { passive:false });
 
-// 📱 свайпы
+// свайпы
 let startX=0,startY=0;
 
 canvas.addEventListener("touchstart", e=>{
@@ -217,7 +206,7 @@ canvas.addEventListener("touchend", e=>{
   }
 });
 
-// 🖥 клавиатура
+// клавиатура
 document.addEventListener("keydown", e=>{
   if(!started) return;
 
@@ -232,3 +221,32 @@ document.getElementById("startBtn").onclick = ()=>{
   document.getElementById("menu").style.display = "none";
   startGame();
 };
+
+// ===== РЕЙТИНГ =====
+
+function sendScore(score){
+  const name = prompt("Твоє ім'я:");
+  if(!name) return;
+
+  fetch("http://localhost:3000/score", {
+    method: "POST",
+    headers: {"Content-Type": "application/json"},
+    body: JSON.stringify({ name, score })
+  });
+}
+
+function loadLeaderboard(){
+  fetch("http://localhost:3000/scores")
+    .then(res => res.json())
+    .then(data => {
+      const div = document.getElementById("leaderboard");
+      div.innerHTML = "<h3>🏆 ТОП</h3>";
+
+      data.forEach((p,i)=>{
+        div.innerHTML += `${i+1}. ${p.name} — ${p.score}<br>`;
+      });
+    });
+}
+
+// загрузка при открытии
+loadLeaderboard();
