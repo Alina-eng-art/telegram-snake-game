@@ -106,7 +106,8 @@ function startGame(){
   dir = {x:1,y:0};
   food = randomFood();
   score = 0;
-  speed = 170;
+
+  speed = 180; // ✅ медленнее старт
 
   shake = 0;
   flash = 0;
@@ -177,8 +178,9 @@ function update(){
 
     vibrate(50);
 
-    if(speed > 80){
-      speed -= 4;
+    // ✅ ПЛАВНОЕ УСКОРЕНИЕ
+    if(speed > 90){
+      speed -= 3; // мягче ускоряется
       clearInterval(gameLoop);
       gameLoop = setInterval(update, speed);
     }
@@ -208,7 +210,7 @@ function draw(){
   ctx.fillStyle = "#1e3a5f";
   ctx.fillRect(0,0,400,400);
 
-  // 🍎 яблоко (КРУГ)
+  // 🍎 яблоко
   ctx.fillStyle = "red";
   ctx.beginPath();
   ctx.arc(food.x*20+10, food.y*20+10, 8, 0, Math.PI*2);
@@ -217,7 +219,7 @@ function draw(){
   ctx.fillStyle = "green";
   ctx.fillRect(food.x*20+9, food.y*20+2, 3, 6);
 
-  // 🐍 змейка SLITHER
+  // 🐍 змейка
   for(let i = snake.length - 1; i >= 0; i--){
     let s = snake[i];
 
@@ -240,7 +242,7 @@ function draw(){
     ctx.fill();
   }
 
-  // 👀 глаза
+  // глаза
   let head = snake[0];
   ctx.fillStyle = "black";
   ctx.beginPath();
@@ -259,7 +261,38 @@ function draw(){
   document.getElementById("score").innerText = score;
 }
 
-// управление
+// ===== 📱 ФИКС МОБИЛКИ =====
+
+// ❌ убираем скролл
+document.body.addEventListener("touchmove", e=>{
+  e.preventDefault();
+}, { passive:false });
+
+// свайпы
+let startX=0,startY=0;
+
+canvas.addEventListener("touchstart", e=>{
+  let t = e.touches[0];
+  startX = t.clientX;
+  startY = t.clientY;
+});
+
+canvas.addEventListener("touchend", e=>{
+  let t = e.changedTouches[0];
+
+  let dx = t.clientX - startX;
+  let dy = t.clientY - startY;
+
+  if(Math.abs(dx) > Math.abs(dy)){
+    if(dx>0 && dir.x!==-1) dir={x:1,y:0};
+    if(dx<0 && dir.x!==1) dir={x:-1,y:0};
+  } else {
+    if(dy>0 && dir.y!==-1) dir={x:0,y:1};
+    if(dy<0 && dir.y!==1) dir={x:0,y:-1};
+  }
+});
+
+// клавиатура
 document.addEventListener("keydown", e=>{
   if(!started) return;
 

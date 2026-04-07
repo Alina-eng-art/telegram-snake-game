@@ -100,3 +100,29 @@ canvas {
 .gold { background: linear-gradient(90deg, gold, orange); color: black; }
 .silver { background: linear-gradient(90deg, #aaa, #666); }
 .bronze { background: linear-gradient(90deg, #ff8844, #aa4400); }
+
+/* крестик норм */
+.modal-header button {
+  font-size: 14px;
+  padding: 5px 8px;
+}
+
+/* аватар */
+.avatar {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  margin-right: 10px;
+}
+
+/* строка игрока */
+.player {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.player-left {
+  display: flex;
+  align-items: center;
+}
