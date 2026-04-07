@@ -66,7 +66,7 @@ canvas {
 .modal-content {
   width: 90%;
   max-width: 360px;
-  background: #07101a;
+  background: #ffffff;
   border-radius: 20px;
   padding: 15px;
   box-shadow: 0 0 20px #00ff88;
@@ -82,7 +82,7 @@ canvas {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  background: rgba(255,255,255,0.05);
+  background: rgb(247, 245, 245);
   padding: 10px;
   border-radius: 12px;
   margin: 6px 0;
@@ -111,7 +111,7 @@ canvas {
   border-radius: 8px; /* квадрат с лёгким скруглением */
   background: rgba(255,255,255,0.1);
   border: none;
-  color: white;
+  color: rgb(156, 135, 135);
   font-size: 14px;
   cursor: pointer;
 
