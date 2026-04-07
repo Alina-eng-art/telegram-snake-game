@@ -3,6 +3,9 @@ html, body {
   padding: 0;
   overflow: hidden;
 
+  background: radial-gradient(circle, #0b1a2a, #02060d); /* тёмный фон */
+  color: white;
+
   touch-action: none;
   overscroll-behavior: none;
   font-family: Arial, sans-serif;
@@ -45,7 +48,7 @@ button {
 .game {
   text-align: center;
   margin-top: 20px;
-  color:#1e3a5f;
+  background: transparent; /* ❌ убираем белый */
 }
 
 .score {
