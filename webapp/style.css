@@ -1,32 +1,29 @@
 body {
   margin: 0;
+  overflow: hidden;
+  background: linear-gradient(#1e2a4a, #0b1a33);
   font-family: Arial;
-  background: linear-gradient(135deg, #0f172a, #1e293b);
-  color: white;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  height: 100vh;
 }
 
-.game {
-  background: rgba(0,0,0,0.5);
-  padding: 20px;
-  border-radius: 15px;
-  text-align: center;
-  width: 300px;
+canvas {
+  display: block;
+}
+
+.controls {
+  position: fixed;
+  bottom: 20px;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  gap: 10px;
 }
 
 button {
-  margin: 10px;
-  padding: 10px 15px;
+  width: 60px;
+  height: 60px;
+  border-radius: 50%;
   border: none;
-  border-radius: 10px;
-  background: #22c55e;
+  font-size: 20px;
+  background: rgba(255,255,255,0.2);
   color: white;
-  cursor: pointer;
-}
-
-button:hover {
-  background: #16a34a;
 }

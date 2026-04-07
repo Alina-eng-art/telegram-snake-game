@@ -8,21 +8,14 @@
 </head>
 <body>
 
-<div class="game">
-  <h1>⚔️ RPG GAME</h1>
+<canvas id="game"></canvas>
 
-  <div class="stats">
-    <p>❤️ HP: <span id="hp">100</span></p>
-    <p>⚔️ Атака: <span id="attack">10</span></p>
-    <p>👹 HP ворога: <span id="enemy">50</span></p>
-  </div>
-
-  <div class="buttons">
-    <button onclick="attack()">⚔️ Атакувати</button>
-    <button onclick="heal()">❤️ Лікуватись</button>
-  </div>
-
-  <p id="log"></p>
+<!-- КНОПКИ ДЛЯ ТЕЛЕФОНА -->
+<div class="controls">
+  <button id="left">⬅️</button>
+  <button id="jump">⬆️</button>
+  <button id="right">➡️</button>
+  <button id="attack">⚔️</button>
 </div>
 
 <script src="script.js"></script>

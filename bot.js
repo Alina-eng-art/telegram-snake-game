@@ -1,6 +1,7 @@
 const { Telegraf, Markup } = require('telegraf')
 
-const bot = new Telegraf('ТВОЙ_ТОКЕН')
+// ❗ ВСТАВЬ СВОЙ НОВЫЙ ТОКЕН
+const bot = new Telegraf('8629708298:AAGnJCGef_FPr8rzqp_WMyWK8-KDMyhEnAI')
 
 // ===== ГРАВЦІ =====
 const players = {}
@@ -29,21 +30,35 @@ function createEnemy(level) {
 
 // ===== СТАРТ =====
 bot.start((ctx) => {
-  const player = getPlayer(ctx.from.id)
+  getPlayer(ctx.from.id)
 
   ctx.reply(
-    `🎮 Ласкаво просимо в RPG!
+    `🎮 RPG Game
 
-Обери дію 👇`,
+Обери режим 👇`,
     Markup.keyboard([
-      ['⚔️ Почати гру'],
+      ['🎮 Грати (з персонажем)'],
+      ['⚔️ Текстова RPG'],
       ['📊 Статистика']
     ]).resize()
   )
 })
 
-// ===== ПОЧАТИ RPG =====
-bot.hears('⚔️ Почати гру', (ctx) => {
+// ===== WEBAPP ГРА =====
+bot.hears('🎮 Грати (з персонажем)', (ctx) => {
+  ctx.reply(
+    'Натисни PLAY 👇',
+    Markup.inlineKeyboard([
+      Markup.button.webApp(
+        '▶️ PLAY',
+        'https://telegram-rpg-bot.vercel.app' // ← ТВОЯ ССЫЛКА
+      )
+    ])
+  )
+})
+
+// ===== ТЕКСТОВА RPG =====
+bot.hears('⚔️ Текстова RPG', (ctx) => {
   const player = getPlayer(ctx.from.id)
   enemies[ctx.from.id] = createEnemy(player.level)
 
@@ -66,7 +81,7 @@ bot.hears('⚔️ Атакувати', (ctx) => {
   const player = getPlayer(ctx.from.id)
   const enemy = enemies[ctx.from.id]
 
-  if (!enemy) return ctx.reply('Натисни "Почати гру"')
+  if (!enemy) return ctx.reply('Спочатку натисни "Текстова RPG"')
 
   enemy.hp -= player.attack
 
@@ -80,7 +95,7 @@ bot.hears('⚔️ Атакувати', (ctx) => {
       player.attack += 2
       player.maxHp += 10
       player.hp = player.maxHp
-      ctx.reply('🎉 РІВЕНЬ ПІДВИЩЕНО!')
+      ctx.reply('🎉 Рівень підвищено!')
     }
 
     enemies[ctx.from.id] = createEnemy(player.level)
@@ -134,7 +149,8 @@ bot.hears('⬅️ Назад', (ctx) => {
   ctx.reply(
     'Головне меню',
     Markup.keyboard([
-      ['⚔️ Почати гру'],
+      ['🎮 Грати (з персонажем)'],
+      ['⚔️ Текстова RPG'],
       ['📊 Статистика']
     ]).resize()
   )
@@ -142,5 +158,4 @@ bot.hears('⬅️ Назад', (ctx) => {
 
 // ===== ЗАПУСК =====
 bot.launch()
-
 console.log('🤖 RPG бот запущено!')
