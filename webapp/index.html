@@ -1,29 +1,25 @@
 <!DOCTYPE html>
-<html lang="uk">
+<html lang="ru">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Snake Game 🐍</title>
+<title>🐍 Snake Game</title>
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
 <div class="game">
-  <h1>🐍 Snake Game</h1>
+  <h2>🐍 Snake</h2>
 
-  <div class="score">
-    Очки: <span id="score">0</span> | 🏆 Рекорд: <span id="best">0</span>
-  </div>
+  <p>Score: <span id="score">0</span></p>
+  <p>🏆 Best: <span id="best">0</span></p>
 
   <canvas id="game"></canvas>
 
-  <div class="controls">
-    <button onclick="setDir('left')">⬅️</button>
-    <button onclick="setDir('up')">⬆️</button>
-    <button onclick="setDir('down')">⬇️</button>
-    <button onclick="setDir('right')">➡️</button>
+  <div class="buttons">
+    <button onclick="explode()">💣</button>
+    <button onclick="teleport()">⚡</button>
   </div>
-
 </div>
 
 <script src="script.js"></script>

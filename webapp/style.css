@@ -1,8 +1,8 @@
 body {
   margin: 0;
-  background: #0b1f44;
-  font-family: Arial;
+  background: #0a0a0a;
   color: white;
+  font-family: Arial;
   text-align: center;
 }
 
@@ -12,23 +12,20 @@ body {
 }
 
 canvas {
-  background: #111;
-  border-radius: 10px;
-  margin-top: 10px;
   width: 100%;
-  aspect-ratio: 1;
+  background: black;
+  border-radius: 10px;
+  touch-action: none;
 }
 
-.controls {
-  margin-top: 15px;
+.buttons {
+  margin-top: 10px;
 }
 
 button {
+  padding: 10px 15px;
   margin: 5px;
-  padding: 15px;
-  font-size: 18px;
-  border-radius: 50%;
   border: none;
-  background: rgba(255,255,255,0.2);
-  color: white;
+  border-radius: 10px;
+  font-size: 18px;
 }
