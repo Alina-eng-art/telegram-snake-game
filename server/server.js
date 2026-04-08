@@ -1,59 +1,84 @@
 const express = require("express");
 const cors = require("cors");
-const fs = require("fs");
+const mongoose = require("mongoose");
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const FILE = "./scores.json";
+// 🔥 ВСТАВЬ СЮДА СВОЮ ССЫЛКУ ИЗ MONGODB
+const MONGO_URI = "mongodb+srv://alina:12345678910@cluster0.d1si0kt.mongodb.net/?appName=Cluster0";
 
-// 📥 загрузка из файла
-function loadPlayers() {
+mongoose.connect(MONGO_URI)
+  .then(() => console.log("✅ MongoDB подключена"))
+  .catch(err => console.log("❌ Ошибка MongoDB:", err));
+
+// 📊 СХЕМА ИГРОКА
+const scoreSchema = new mongoose.Schema({
+  user_id: { type: String, unique: true },
+  name: String,
+  score: Number,
+  avatar: String
+});
+
+const Score = mongoose.model("Score", scoreSchema);
+
+// 💾 СОХРАНЕНИЕ СКОРА (ТОЛЬКО ЛУЧШИЙ)
+app.post("/score", async (req, res) => {
   try {
-    const data = fs.readFileSync(FILE, "utf8");
-    return JSON.parse(data);
-  } catch {
-    return {};
-  }
-}
+    const { user_id, name, score, avatar } = req.body;
 
-// 💾 сохранение в файл
-function savePlayers(players) {
-  fs.writeFileSync(FILE, JSON.stringify(players, null, 2));
-}
-
-// 🧠 теперь данные НЕ пропадут
-let players = loadPlayers();
-
-// сохранить скор
-app.post("/score", (req, res) => {
-  const { user_id, name, score, avatar } = req.body;
-
-  if (!user_id) return res.sendStatus(400);
-
-  if (players[user_id]) {
-    if (score > players[user_id].score) {
-      players[user_id].score = score;
+    if (!user_id) {
+      return res.status(400).json({ error: "No user_id" });
     }
-  } else {
-    players[user_id] = { name, score, avatar };
+
+    let player = await Score.findOne({ user_id });
+
+    if (!player) {
+      player = new Score({
+        user_id,
+        name,
+        score,
+        avatar
+      });
+    } else {
+      // 🔥 сохраняем только лучший результат
+      if (score > player.score) {
+        player.score = score;
+      }
+    }
+
+    await player.save();
+
+    res.json({ success: true });
+  } catch (err) {
+    console.log("❌ Ошибка /score:", err);
+    res.sendStatus(500);
   }
-
-  savePlayers(players); // 🔥 ВАЖНО
-
-  res.sendStatus(200);
 });
 
-// получить рейтинг
-app.get("/scores", (req, res) => {
-  const sorted = Object.values(players)
-    .sort((a, b) => b.score - a.score)
-    .slice(0, 50);
+// 🏆 ПОЛУЧИТЬ ТОП
+app.get("/scores", async (req, res) => {
+  try {
+    const scores = await Score.find()
+      .sort({ score: -1 })
+      .limit(50);
 
-  res.json(sorted);
+    res.json(scores);
+  } catch (err) {
+    console.log("❌ Ошибка /scores:", err);
+    res.sendStatus(500);
+  }
 });
 
-app.listen(3001, () => {
-  console.log("🔥 Server started on port 3001");
+// ❤️ ПРОВЕРКА СЕРВЕРА
+app.get("/", (req, res) => {
+  res.send("🚀 Snake server работает");
+});
+
+// 🚀 ЗАПУСК
+const PORT = process.env.PORT || 3001;
+
+app.listen(PORT, () => {
+  console.log(`🔥 Server started on port ${PORT}`);
 });
