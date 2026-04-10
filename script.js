@@ -58,23 +58,34 @@ const avatar = user.photo_url || "";
 best = localStorage.getItem("snake_best") || 0;
 document.getElementById("best").innerText = best;
 
-// UI
-window.addEventListener("load", () => {
+// 🔥🔥🔥 ВОТ ГЛАВНЫЙ ФИКС
+document.addEventListener("DOMContentLoaded", () => {
 
-  document.getElementById("startBtn").addEventListener("click", () => {
-    unlockSound();
-    document.getElementById("menu").style.display = "none";
-    startGame();
-  });
+  const startBtn = document.getElementById("startBtn");
+  const topBtn = document.getElementById("topBtn");
+  const closeBtn = document.getElementById("closeRating");
 
-  document.getElementById("topBtn").addEventListener("click", openRating);
+  if(startBtn){
+    startBtn.addEventListener("click", () => {
+      unlockSound();
+      document.getElementById("menu").style.display = "none";
+      startGame();
+    });
+  }
 
-  document.getElementById("closeRating").addEventListener("click", () => {
-    document.getElementById("ratingModal").classList.add("hidden");
-  });
+  if(topBtn){
+    topBtn.addEventListener("click", openRating);
+  }
+
+  if(closeBtn){
+    closeBtn.addEventListener("click", () => {
+      document.getElementById("ratingModal").classList.add("hidden");
+    });
+  }
 
   document.body.addEventListener("touchstart", unlockSound, { once:true });
   document.body.addEventListener("click", unlockSound, { once:true });
+
 });
 
 // API
@@ -135,7 +146,6 @@ function startGame(){
   food = randomFood();
   score = 0;
 
-  // 🔥 МЕДЛЕННЕЕ СТАРТ
   speed = 240;
 
   flash = 0;
@@ -212,7 +222,6 @@ function update(){
 
     vibrate(50);
 
-    // 💚 ПЛАВНОЕ УСКОРЕНИЕ
     if(speed > 140){
       speed -= 2;
     } else if(speed > 110){
@@ -298,40 +307,7 @@ function draw(){
   document.getElementById("score").innerText = score;
 }
 
-// свайпы
-let startX = 0;
-let startY = 0;
-
-canvas.addEventListener("touchstart", (e) => {
-  const t = e.touches[0];
-  startX = t.clientX;
-  startY = t.clientY;
-}, { passive: false });
-
-canvas.addEventListener("touchmove", (e) => {
-  e.preventDefault();
-}, { passive: false });
-
-canvas.addEventListener("touchend", (e) => {
-  e.preventDefault();
-
-  const t = e.changedTouches[0];
-
-  let dx = t.clientX - startX;
-  let dy = t.clientY - startY;
-
-  if(Math.abs(dx) < 25 && Math.abs(dy) < 25) return;
-
-  if(Math.abs(dx) > Math.abs(dy)){
-    if(dx > 0 && dir.x !== -1) dir = {x:1,y:0};
-    if(dx < 0 && dir.x !== 1) dir = {x:-1,y:0};
-  } else {
-    if(dy > 0 && dir.y !== -1) dir = {x:0,y:1};
-    if(dy < 0 && dir.y !== 1) dir = {x:0,y:-1};
-  }
-}, { passive: false });
-
-// клавиатура
+// управление
 document.addEventListener("keydown", e=>{
   if(!started) return;
 
