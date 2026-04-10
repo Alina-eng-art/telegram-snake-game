@@ -1,5 +1,5 @@
 // 🔥 TELEGRAM INIT
-console.log("HELLO NEW VERSION");
+
 const tg = window.Telegram?.WebApp;
 tg?.expand();
 tg?.disableVerticalSwipes?.();
